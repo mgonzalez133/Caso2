@@ -169,7 +169,6 @@ public class Imagen {
             // Ejemplo para esconder un mensaje
             System.out.println("Nombre del archivo con la imagen a procesar: ");
             String ruta = br.readLine();
-            System.out.println(ruta);
             Imagen imagen = new Imagen(ruta);
 
             System.out.println("Nombre del archivo con el mensaje a esconder: ");
@@ -191,6 +190,7 @@ public class Imagen {
             longitud = imagen.leerLongitud();
             char[] recuperado = new char[longitud];
             imagen.recuperar(recuperado, longitud);
+            escribirArchivoTexto(salida, recuperado);
 
             // Escribe el mensaje recuperado en el archivo de salida
             // Aquí podrías escribir los caracteres recuperados a un archivo
@@ -200,21 +200,31 @@ public class Imagen {
     }
 
     public static int leerArchivoTexto(String rutaArchivo) {
-        StringBuilder mensaje = new StringBuilder();
-        
-        try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                mensaje.append(linea).append("\n");
+    StringBuilder mensaje = new StringBuilder();
+    
+    try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
+        String linea;
+        while ((linea = br.readLine()) != null) {
+            mensaje.append(linea).append("\n");
+        }
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    
+    // Convertir el StringBuilder a un array de caracteres
+    char[] mensajeArray = mensaje.toString().toCharArray();
+    
+    // Devolver la longitud del mensaje
+    return mensajeArray.length;
+}
+
+    public static void escribirArchivoTexto(String rutaArchivo, char[] mensaje) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
+            for (char c : mensaje) {
+                bw.write(c);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
-        // Convertir el StringBuilder a un array de caracteres
-        char[] mensajeArray = mensaje.toString().toCharArray();
-        
-        // Devolver la longitud del mensaje
-        return mensajeArray.length;
     }
 }
