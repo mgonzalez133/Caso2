@@ -169,6 +169,7 @@ public class Imagen {
             // Ejemplo para esconder un mensaje
             System.out.println("Nombre del archivo con la imagen a procesar: ");
             String ruta = br.readLine();
+            System.out.println(ruta);
             Imagen imagen = new Imagen(ruta);
 
             System.out.println("Nombre del archivo con el mensaje a esconder: ");
