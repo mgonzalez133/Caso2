@@ -21,7 +21,7 @@ public class Datos {
             Imagen imagen = new Imagen(nombreArchivoImagen);
             this.filasMatriz = imagen.getAlto();
             this.columnasMatriz = imagen.getAncho();
-            this.longitudMensaje = imagen.leerLongitudMensaje(); // Leer la longitud del mensaje escondido
+            this.longitudMensaje = imagen.leerLongitud(); // Leer la longitud del mensaje escondido
 
             // Calcular las referencias de la imagen y el vector del mensaje
             generarArchivoReferencias(imagen);
