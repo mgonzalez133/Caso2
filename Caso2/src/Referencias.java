@@ -11,11 +11,12 @@ public class Referencias {
     private int numReferencias;
     private int numPaginasVirtuales;
     private int longitudMensaje;
+    private String nombreArchivoImagen;
 
     // Método para generar las referencias
     public void generarReferencias(int tamanoPagina, String nombreArchivoImagen) {
         this.tamanoPagina = tamanoPagina;
-        
+        this.nombreArchivoImagen = nombreArchivoImagen;
         try {
             // Abrir la imagen para leer sus dimensiones y el mensaje escondido
             Imagen imagen = new Imagen(nombreArchivoImagen);

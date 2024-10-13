@@ -29,7 +29,8 @@ public class Consola {
                     int tamanoPaginas = scanner.nextInt();
                     System.out.println("Porfavor Indique el nombre del archivo que guarda la imagen con el mensaje");
                     String ruta = br.readLine();
-                   
+                    Referencias ref = new Referencias();
+                    ref.generarReferencias(tamanoPaginas,ruta);
 
                     break;
                 case 2:
@@ -45,6 +46,7 @@ public class Consola {
         scanner.close();
     }
 
-    Referencias generacionReferencias = new Referencias(0, null);
+
+    
 
 }
