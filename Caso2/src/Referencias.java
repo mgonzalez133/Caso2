@@ -42,7 +42,8 @@ public class Referencias {
         numPaginasVirtuales = (numReferencias + tamanoPagina - 1) / tamanoPagina; // Redondeo para páginas virtuales
 
         // Crear archivo de salida
-        File archivoReferencias = new File("referencias_" + tamanoPagina + ".txt");
+        File carpetaArchivos = new File(System.getProperty("user.dir") + File.separator + "archivos");
+        File archivoReferencias = new File(carpetaArchivos, "referencias_" + tamanoPagina + ".txt");
         BufferedWriter writer = new BufferedWriter(new FileWriter(archivoReferencias));
 
         // Escribir los datos generales
@@ -58,15 +59,15 @@ public class Referencias {
         for (int i = 0; i < filasMatriz; i++) {
             for (int j = 0; j < columnasMatriz; j++) {
                 // Referencias de R, G, B (lectura de la imagen)
-                referencias.add(generarReferencia("Imagen", i, j, "R", contadorBytes++, tamanoPagina));
-                referencias.add(generarReferencia("Imagen", i, j, "G", contadorBytes++, tamanoPagina));
-                referencias.add(generarReferencia("Imagen", i, j, "B", contadorBytes++, tamanoPagina));
+                referencias.add(generarReferencia("Imagen", i, j, "R", contadorBytes++, tamanoPagina, "R"));
+                referencias.add(generarReferencia("Imagen", i, j, "G", contadorBytes++, tamanoPagina, "R"));
+                referencias.add(generarReferencia("Imagen", i, j, "B", contadorBytes++, tamanoPagina, "R"));
             }
         }
 
         // Generar las referencias del mensaje escondido (empezando en el byte 17)
         for (int k = 0; k < longitudMensaje; k++) {
-            referencias.add(generarReferencia("Mensaje", 0, k, "W", contadorBytes++, tamanoPagina));
+            referencias.add(generarReferencia("Mensaje", 0, k, "", contadorBytes++, tamanoPagina, "W"));
         }
 
         // Escribir las referencias en el archivo
@@ -79,10 +80,15 @@ public class Referencias {
     }
 
     // Método para generar la referencia en el formato especificado
-    private String generarReferencia(String tipo, int fila, int columna, String canal, int byteActual, int tamanoPagina) {
+    private String generarReferencia(String tipo, int fila, int columna, String color, int byteActual, int tamanoPagina, String canal) {
         int paginaVirtual = byteActual / tamanoPagina;
         int desplazamiento = byteActual % tamanoPagina;
-        return tipo + "[" + fila + "][" + columna + "]," + paginaVirtual + "," + desplazamiento + "," + canal;
+        if (tipo == "Mensaje") {
+            return tipo + "[" + columna + "]," + paginaVirtual + "," + desplazamiento + "," + canal;
+        }
+        else {
+            return tipo + "[" + fila + "][" + columna + "]." + color + "," + paginaVirtual + "," + desplazamiento + "," + canal;
+        }
     }
 
     // Getters si se necesitan más adelante
