@@ -1,11 +1,16 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Scanner;
 
 public class Consola {
 
     private static Referencias referencias;
     private static Datos datos;
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws IOException {
+        
+        InputStreamReader isr = new InputStreamReader(System.in);
+        BufferedReader br = new BufferedReader(isr);
         Scanner scanner = new Scanner(System.in);
         int opcion;
 
@@ -20,7 +25,12 @@ public class Consola {
             opcion = scanner.nextInt();
             switch (opcion) {
                 case 1:
-                    System.out.println("Has elegido la Opción 1:...");
+                    System.out.println("Porfavor Indique el tamaño de página");
+                    int tamanoPaginas = scanner.nextInt();
+                    System.out.println("Porfavor Indique el nombre del archivo que guarda la imagen con el mensaje");
+                    String ruta = br.readLine();
+                   
+
                     break;
                 case 2:
                     System.out.println("Has elegido la Opción 2: ....");
@@ -34,5 +44,7 @@ public class Consola {
 
         scanner.close();
     }
+
+    Referencias generacionReferencias = new Referencias(0, null);
 
 }
