@@ -227,4 +227,16 @@ public class Imagen {
             e.printStackTrace();
         }
     }
+
+    public int getAlto() {
+        return alto;
+    }
+
+    /**
+     * Obtener el ancho de la imagen (número de columnas)
+     * @return el ancho de la imagen
+     */
+    public int getAncho() {
+        return ancho;
+    }
 }
