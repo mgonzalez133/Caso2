@@ -34,7 +34,12 @@ public class Consola {
 
                     break;
                 case 2:
-                    System.out.println("Has elegido la Opción 2: ....");
+                    System.out.println("Indique el número de marcos de página. ");
+                    int marcosPagina = scanner.nextInt();
+                    System.out.println("Porfavor Indique el nombre del archivo que guarda las referencias");
+                    String rutaRef = br.readLine();
+                    Datos dat = new Datos();
+                    dat.calcularDatos(marcosPagina, rutaRef);
                     break;
                 
                     default:
