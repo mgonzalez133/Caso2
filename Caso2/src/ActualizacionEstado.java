@@ -1,10 +1,6 @@
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
-public class Datos {
+public class ActualizacionEstado extends Thread{
 
-    // Atributos de la clase
     private int marcosPagina;
     private String nombreArchivoReferencias;
     
@@ -14,7 +10,17 @@ public class Datos {
         this.marcosPagina = marcosPagina;
         this.nombreArchivoReferencias = nombreArchivoReferencias;
         
-    
-        
     }
+
+    int bitReferencia ;
+    int bitModificación;
+    int hint;
+    int misses;
+
+
+    @Override
+    public void run(){
+
+    }
+    
 }

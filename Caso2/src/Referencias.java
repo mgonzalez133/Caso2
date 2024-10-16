@@ -13,18 +13,18 @@ public class Referencias {
     private int longitudMensaje;
     private String nombreArchivoImagen;
 
-    // Método para generar las referencias
+    // Método principal para generar referencias
     public void generarReferencias(int tamanoPagina, String nombreArchivoImagen) {
         this.tamanoPagina = tamanoPagina;
         this.nombreArchivoImagen = nombreArchivoImagen;
         try {
-            // Abrir la imagen para leer sus dimensiones y el mensaje escondido
+            // Abrir la imagen para obtener las dimensiones y la longitud del mensaje escondido
             Imagen imagen = new Imagen(nombreArchivoImagen);
             this.filasMatriz = imagen.getAlto();
             this.columnasMatriz = imagen.getAncho();
-            this.longitudMensaje = imagen.leerLongitud(); // Leer la longitud del mensaje escondido
+            this.longitudMensaje = imagen.leerLongitud(); // Longitud del mensaje escondido (en bits)
 
-            // Calcular las referencias de la imagen y el vector del mensaje
+            // Generar y guardar el archivo de referencias
             generarArchivoReferencias(imagen);
 
         } catch (IOException e) {
@@ -32,21 +32,20 @@ public class Referencias {
         }
     }
 
-    // Método para calcular y escribir las referencias a un archivo
+    // Método para generar las referencias y escribirlas en un archivo
     private void generarArchivoReferencias(Imagen imagen) throws IOException {
         List<String> referencias = new ArrayList<>();
-        
-        // Asumiendo row-major order, generamos las referencias fila por fila
-        int numBytesPorFila = columnasMatriz * 3; // Cada fila tiene ancho columnas * 3 (RGB)
-        numReferencias = filasMatriz * columnasMatriz * 3 + longitudMensaje; // Cada pixel tiene 3 referencias (RGB) más las del mensaje
-        numPaginasVirtuales = (numReferencias + tamanoPagina - 1) / tamanoPagina; // Redondeo para páginas virtuales
+        int numBytesPorFila = columnasMatriz * 3; // Cada fila tiene columnas * 3 bytes (RGB)
+        numReferencias = filasMatriz * columnasMatriz * 3 + longitudMensaje; // Total de referencias
+        numPaginasVirtuales = (numReferencias + tamanoPagina - 1) / tamanoPagina; // Redondeo hacia arriba
 
         // Crear archivo de salida
         File carpetaArchivos = new File(System.getProperty("user.dir") + File.separator + "archivos");
+        if (!carpetaArchivos.exists()) carpetaArchivos.mkdir();
         File archivoReferencias = new File(carpetaArchivos, "referencias_" + tamanoPagina + ".txt");
         BufferedWriter writer = new BufferedWriter(new FileWriter(archivoReferencias));
 
-        // Escribir los datos generales
+        // Escribir los datos generales en el archivo
         writer.write("TP: " + tamanoPagina + "\n");
         writer.write("NF: " + filasMatriz + "\n");
         writer.write("NC: " + columnasMatriz + "\n");
@@ -54,23 +53,23 @@ public class Referencias {
         writer.write("NP: " + numPaginasVirtuales + "\n");
         writer.write("\n");
 
-        // Generar las referencias de la imagen
+        // Generar las referencias de la imagen (byte a byte)
         int contadorBytes = 0;
         for (int i = 0; i < filasMatriz; i++) {
             for (int j = 0; j < columnasMatriz; j++) {
-                // Referencias de R, G, B (lectura de la imagen)
+                // Generar referencias de los componentes R, G, B de cada pixel
                 referencias.add(generarReferencia("Imagen", i, j, "R", contadorBytes++, tamanoPagina, "R"));
                 referencias.add(generarReferencia("Imagen", i, j, "G", contadorBytes++, tamanoPagina, "R"));
                 referencias.add(generarReferencia("Imagen", i, j, "B", contadorBytes++, tamanoPagina, "R"));
             }
         }
 
-        // Generar las referencias del mensaje escondido (empezando en el byte 17)
+        // Generar las referencias del mensaje escondido (a partir del byte 17)
         for (int k = 0; k < longitudMensaje; k++) {
             referencias.add(generarReferencia("Mensaje", 0, k, "", contadorBytes++, tamanoPagina, "W"));
         }
 
-        // Escribir las referencias en el archivo
+        // Escribir todas las referencias en el archivo
         for (String referencia : referencias) {
             writer.write(referencia + "\n");
         }
@@ -79,18 +78,29 @@ public class Referencias {
         System.out.println("Archivo de referencias generado: " + archivoReferencias.getAbsolutePath());
     }
 
-    // Método para generar la referencia en el formato especificado
+    // Método para generar una referencia en el formato especificado
     private String generarReferencia(String tipo, int fila, int columna, String color, int byteActual, int tamanoPagina, String canal) {
+        if (tipo == null) {
+            return "Error: El tipo es nulo.";
+        }
+    
         int paginaVirtual = byteActual / tamanoPagina;
         int desplazamiento = byteActual % tamanoPagina;
-        if (tipo == "Mensaje") {
+    
+        // Condición para "Mensaje"
+        if (tipo.equals("Mensaje")) {
             return tipo + "[" + columna + "]," + paginaVirtual + "," + desplazamiento + "," + canal;
         }
-        else {
+        
+        // Condición para "Imagen"
+        if (tipo.equals("Imagen")) {
             return tipo + "[" + fila + "][" + columna + "]." + color + "," + paginaVirtual + "," + desplazamiento + "," + canal;
         }
+    
+        // Devolver un valor por defecto para tipos desconocidos
+        return "Error: Tipo desconocido - " + tipo;
     }
-
+    
     // Getters si se necesitan más adelante
     public int getTamanoPagina() {
         return tamanoPagina;
@@ -112,3 +122,4 @@ public class Referencias {
         return numPaginasVirtuales;
     }
 }
+

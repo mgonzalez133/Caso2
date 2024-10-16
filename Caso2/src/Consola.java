@@ -5,8 +5,7 @@ import java.util.Scanner;
 
 public class Consola {
 
-    private static Referencias referencias;
-    private static Datos datos;
+    
     public static void main(String[] args) throws IOException {
         
         InputStreamReader isr = new InputStreamReader(System.in);
@@ -38,7 +37,7 @@ public class Consola {
                     int marcosPagina = scanner.nextInt();
                     System.out.println("Porfavor Indique el nombre del archivo que guarda las referencias");
                     String rutaRef = br.readLine();
-                    Datos dat = new Datos();
+                    ActualizacionEstado dat = new ActualizacionEstado();
                     dat.calcularDatos(marcosPagina, rutaRef);
                     break;
                 
