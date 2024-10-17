@@ -1,107 +1,118 @@
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.*;
 
 public class Datos {
+    private int[] marcosPagina;
+    private boolean[] bitR;
+    private boolean[] bitM;
+    private Queue<Integer> colaMarcos;
+    private int hits;
+    private int fallasPagina;
+    private int tamanioPagina;
+    private long tiempoHits;
+    private long tiempoFallas;
 
-    // Atributos de la clase
-    private int tamanoPagina;
-    private int filasMatriz;
-    private int columnasMatriz;
-    private int numReferencias;
-    private int numPaginasVirtuales;
-    private int longitudMensaje;
+    // Constructor
+    public Datos(int numPaginas, int numMarcos, int tamanioPagina) {
+        this.marcosPagina = new int[numMarcos];
+        this.bitR = new boolean[numPaginas];
+        this.bitM = new boolean[numPaginas];
+        this.colaMarcos = new LinkedList<>();
+        this.hits = 0;
+        this.fallasPagina = 0;
+        this.tamanioPagina = tamanioPagina;
 
-    // Método para generar las referencias
-    public void generarReferencias(int tamanoPagina, String nombreArchivoImagen) {
-        this.tamanoPagina = tamanoPagina;
-        
-        try {
-            // Abrir la imagen para leer sus dimensiones y el mensaje escondido
-            Imagen imagen = new Imagen(nombreArchivoImagen);
-            this.filasMatriz = imagen.getAlto();
-            this.columnasMatriz = imagen.getAncho();
-            this.longitudMensaje = imagen.leerLongitud(); // Leer la longitud del mensaje escondido
+        Arrays.fill(marcosPagina, -1);
 
-            // Calcular las referencias de la imagen y el vector del mensaje
-            generarArchivoReferencias(imagen);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        for (int i = 0; i < numMarcos; i++) {
+            colaMarcos.add(i);
         }
     }
 
-    // Método para calcular y escribir las referencias a un archivo
-    private void generarArchivoReferencias(Imagen imagen) throws IOException {
-        List<String> referencias = new ArrayList<>();
-        
-        // Asumiendo row-major order, generamos las referencias fila por fila
-        int numBytesPorFila = columnasMatriz * 3; // Cada fila tiene ancho columnas * 3 (RGB)
-        numReferencias = filasMatriz * columnasMatriz * 3 + longitudMensaje; // Cada pixel tiene 3 referencias (RGB) más las del mensaje
-        numPaginasVirtuales = (numReferencias + tamanoPagina - 1) / tamanoPagina; // Redondeo para páginas virtuales
+    // Procesar cada referencia y determinar si es un hit o falla
+    public synchronized void procesarReferencia(int pagina, boolean escritura) {
+        if (estaEnRAM(pagina)) {
+            hits++;
+            tiempoHits += 25; // Tiempo de acceso en ns
+            bitR[pagina] = true;
+            if (escritura) {
+                bitM[pagina] = true;
+            }
+        } else {
+            fallasPagina++;
+            tiempoFallas += 10_000_000; // Tiempo de acceso en ns (10 ms = 10,000,000 ns)
+            reemplazarPagina(pagina);
+        }
+    }
 
-        // Crear archivo de salida
-        File archivoReferencias = new File("referencias_" + tamanoPagina + ".txt");
-        BufferedWriter writer = new BufferedWriter(new FileWriter(archivoReferencias));
-
-        // Escribir los datos generales
-        writer.write("TP: " + tamanoPagina + "\n");
-        writer.write("NF: " + filasMatriz + "\n");
-        writer.write("NC: " + columnasMatriz + "\n");
-        writer.write("NR: " + numReferencias + "\n");
-        writer.write("NP: " + numPaginasVirtuales + "\n");
-        writer.write("\n");
-
-        // Generar las referencias de la imagen
-        int contadorBytes = 0;
-        for (int i = 0; i < filasMatriz; i++) {
-            for (int j = 0; j < columnasMatriz; j++) {
-                // Referencias de R, G, B (lectura de la imagen)
-                referencias.add(generarReferencia("Imagen", i, j, "R", contadorBytes++, tamanoPagina));
-                referencias.add(generarReferencia("Imagen", i, j, "G", contadorBytes++, tamanoPagina));
-                referencias.add(generarReferencia("Imagen", i, j, "B", contadorBytes++, tamanoPagina));
+    // Verificar si una página está en un marco de la RAM
+    private boolean estaEnRAM(int pagina) {
+        for (int marco : marcosPagina) {
+            if (marco == pagina) {
+                return true;
             }
         }
+        return false;
+    }
 
-        // Generar las referencias del mensaje escondido (empezando en el byte 17)
-        for (int k = 0; k < longitudMensaje; k++) {
-            referencias.add(generarReferencia("Mensaje", 0, k, "W", contadorBytes++, tamanoPagina));
+    // Reemplazar una página en un marco usando el algoritmo NRU
+    private void reemplazarPagina(int nuevaPagina) {
+        int marcoReemplazo = colaMarcos.poll();
+        int paginaReemplazo = marcosPagina[marcoReemplazo];
+
+        // Resetear los bits de la página reemplazada si no es -1 (significa que hay una página previa)
+        if (paginaReemplazo != -1) {
+            bitR[paginaReemplazo] = false;
+            bitM[paginaReemplazo] = false;
         }
 
-        // Escribir las referencias en el archivo
-        for (String referencia : referencias) {
-            writer.write(referencia + "\n");
+        // Actualizar la tabla con la nueva página y marcarla como referenciada
+        marcosPagina[marcoReemplazo] = nuevaPagina;
+        bitR[nuevaPagina] = true;
+        colaMarcos.add(marcoReemplazo);
+    }
+
+    public void cargarReferencias(String archivoRef) {
+        try (Scanner scanner = new Scanner(new File(archivoRef))) {
+            while (scanner.hasNextLine()) {
+                String linea = scanner.nextLine();
+    
+                // Ignorar las líneas de metadatos (TP, NF, NC, NP)
+                if (linea.startsWith("TP=") || linea.startsWith("NF=") || linea.startsWith("NC=") || linea.startsWith("NP=")) {
+                    continue; // Saltar a la siguiente línea si es una línea de metadatos
+                }
+    
+                // Procesar las líneas de referencias (esperando formato "pagina,desplazamiento,R")
+                String[] ref = linea.split(",");
+                if (ref.length < 3) {
+                    System.out.println("Formato incorrecto en la línea: " + linea);
+                    continue; // Saltar líneas con formato incorrecto para evitar errores
+                }
+    
+                int pagina = Integer.parseInt(ref[0].trim());
+                boolean escritura = "W".equals(ref[2].trim());
+                procesarReferencia(pagina, escritura);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (NumberFormatException e) {
+            System.out.println("Error al convertir una referencia: " + e.getMessage());
         }
-
-        writer.close();
-        System.out.println("Archivo de referencias generado: " + archivoReferencias.getAbsolutePath());
     }
+    
+    
 
-    // Método para generar la referencia en el formato especificado
-    private String generarReferencia(String tipo, int fila, int columna, String canal, int byteActual, int tamanoPagina) {
-        int paginaVirtual = byteActual / tamanoPagina;
-        int desplazamiento = byteActual % tamanoPagina;
-        return tipo + "[" + fila + "][" + columna + "]," + paginaVirtual + "," + desplazamiento + "," + canal;
-    }
+    // Método para simular la paginación y mostrar los resultados
+    public void simularPaginacion() {
+        long tiempoTotal = tiempoHits + tiempoFallas;
 
-    // Getters si se necesitan más adelante
-    public int getTamanoPagina() {
-        return tamanoPagina;
-    }
-
-    public int getFilasMatriz() {
-        return filasMatriz;
-    }
-
-    public int getColumnasMatriz() {
-        return columnasMatriz;
-    }
-
-    public int getNumReferencias() {
-        return numReferencias;
-    }
-
-    public int getNumPaginasVirtuales() {
-        return numPaginasVirtuales;
+        System.out.println("Simulación completa.");
+        System.out.println("Tamaño de página: " + tamanioPagina + " bytes");
+        System.out.println("Total de Hits: " + hits);
+        System.out.println("Total de Fallas de Página: " + fallasPagina);
+        System.out.println("Tiempo total de Hits: " + tiempoHits + " ns");
+        System.out.println("Tiempo total de Fallas: " + tiempoFallas + " ns");
+        System.out.println("Tiempo total de acceso: " + tiempoTotal + " ns (" + tiempoTotal / 1_000_000 + " ms)");
     }
 }
