@@ -5,8 +5,7 @@ import java.util.Scanner;
 
 public class Consola {
 
-    private static Referencias referencias;
-    private static Datos datos;
+    
     public static void main(String[] args) throws IOException {
         
         InputStreamReader isr = new InputStreamReader(System.in);
@@ -54,7 +53,16 @@ public class Consola {
 
                     break;
                 case 2:
+<<<<<<< HEAD
                     System.out.println("Has elegido la Opción 2: Calcular datos buscados.");
+=======
+                    System.out.println("Indique el número de marcos de página. ");
+                    int marcosPagina = scanner.nextInt();
+                    System.out.println("Porfavor Indique el nombre del archivo que guarda las referencias");
+                    String rutaRef = br.readLine();
+                    ActualizacionEstado dat = new ActualizacionEstado();
+                    dat.calcularDatos(marcosPagina, rutaRef);
+>>>>>>> 786b290babed24af610c82ad3231853c3603164e
                     break;
                 case 3:
                     System.out.println("Saliendo del programa...");
