@@ -64,48 +64,36 @@ public class Referencias {
         escritor.newLine();
     }
 
-    private void escribirReferencias(BufferedWriter escritor, int totalReferencias, int tamanoMensaje)
-            throws IOException {
+    private void escribirReferencias(BufferedWriter escritor, int totalReferencias, int tamanoMensaje) throws IOException {
         int desplazamiento = 0;
         int paginaVirtual = 0;
         int fila = 0, columna = 0;
         String[] canales = { "R", "G", "B" };
         int canalIndice = 0;
-
+        int indiceMensaje = 0; // Índice separado para controlar las referencias de mensaje
+    
         // Calcula los datos de la imagen: ancho y alto
         int anchoImagen = imagen.getAncho();
         int altoImagen = imagen.getAlto();
-
+    
         int tamanoImagen = anchoImagen * altoImagen * 3;
-
+    
         int bytesImagen = tamanoImagen;
-
+    
         int paginaInicialMensaje = bytesImagen / tamanoPagina;
         int desplazamientoMensaje = bytesImagen % tamanoPagina;
-
+    
         for (int i = 0; i < totalReferencias; i++) {
-            if (i < 16) {
-                escritor.write(
-                        formatearReferenciaImagen(fila, columna, canales[canalIndice], paginaVirtual, desplazamiento));
-            } else if (i % 2 == 0) {
-                escritor.write(formatearReferenciaMensaje(i / 2, paginaInicialMensaje, desplazamientoMensaje));
-                desplazamientoMensaje++;
-
-                if (desplazamientoMensaje == tamanoPagina) {
-                    desplazamientoMensaje = 0;
-                    paginaInicialMensaje++;
-                }
-            } else {
-                escritor.write(
-                        formatearReferenciaImagen(fila, columna, canales[canalIndice], paginaVirtual, desplazamiento));
+            if (i < 16) {  // Referencias de la imagen
+                escritor.write(formatearReferenciaImagen(fila, columna, canales[canalIndice], paginaVirtual, desplazamiento));
                 desplazamiento++;
                 canalIndice = (canalIndice + 1) % 3;
-
+    
                 if (desplazamiento == tamanoPagina) {
                     desplazamiento = 0;
                     paginaVirtual++;
                 }
-
+    
                 if (canalIndice == 0) {
                     columna++;
                     if (columna == anchoImagen) {
@@ -113,17 +101,48 @@ public class Referencias {
                         fila++;
                     }
                 }
+            } else {  
+                if (i % 2 == 0) {  // Referencias del mensaje
+                    escritor.write(formatearReferenciaMensaje(indiceMensaje, paginaInicialMensaje, desplazamientoMensaje));
+                    indiceMensaje++; // Aumenta el índice del mensaje correctamente
+                    desplazamientoMensaje++;
+    
+                    if (desplazamientoMensaje == tamanoPagina) {
+                        desplazamientoMensaje = 0;
+                        paginaInicialMensaje++;
+                    }
+                } else {  // Referencias de la imagen
+                    escritor.write(formatearReferenciaImagen(fila, columna, canales[canalIndice], paginaVirtual, desplazamiento));
+                    desplazamiento++;
+                    canalIndice = (canalIndice + 1) % 3;
+    
+                    if (desplazamiento == tamanoPagina) {
+                        desplazamiento = 0;
+                        paginaVirtual++;
+                    }
+    
+                    if (canalIndice == 0) {
+                        columna++;
+                        if (columna == anchoImagen) {
+                            columna = 0;
+                            fila++;
+                        }
+                    }
+                }
             }
-
+    
             escritor.newLine();
         }
     }
+    
+   
+
 
     private String formatearReferenciaImagen(int fila, int columna, String canal, int pagina, int offset) {
-        return "Imagen[" + fila + "][" + columna + "]." + canal + "," + offset + "," + pagina + ",R";
+        return "Imagen[" + fila + "][" + columna + "]." + canal + "," + pagina + "," + offset + ",R";
     }
 
     private String formatearReferenciaMensaje(int byteMensaje, int pagina, int offset) {
-        return "Mensaje[" + byteMensaje + "]," + offset + "," + pagina + ",W";
+        return "Mensaje[" + byteMensaje + "]," + pagina + "," + offset + ",W";
     }
 }
