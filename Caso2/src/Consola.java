@@ -21,7 +21,9 @@ public class Consola {
             System.out.println("========= MENÚ =========");
             System.out.println("1. Generación de las referencias");
             System.out.println("2. Calcular datos buscados");
-            System.out.println("3. Salir");
+            System.out.println("3. Esconder un mensaje ");
+            System.out.println("4. Recuperar un mensaje");
+            System.out.println("5. Salir");
             System.out.print("Elige una opción: ");
 
             opcion = scanner.nextInt();
