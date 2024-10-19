@@ -6,7 +6,6 @@ import java.util.Scanner;
 public class Consola {
 
     private static Referencias referencias;
-    private static Datos datos;
     public static void main(String[] args) throws IOException {
         
         InputStreamReader isr = new InputStreamReader(System.in);
