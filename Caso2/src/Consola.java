@@ -6,6 +6,7 @@ import java.util.Scanner;
 public class Consola {
 
     private static Referencias referencias;
+    private static Simulador simulador;
     public static void main(String[] args) throws IOException {
         
         InputStreamReader isr = new InputStreamReader(System.in);
@@ -34,6 +35,7 @@ public class Consola {
                     System.out.println(System.getProperty("user.dir") + "/Archivos/");
                     String ruta = System.getProperty("user.dir") + "/Archivos/";
                     String nombreArchivo = "";
+                    String nombreArchivoRef = "";
 
                     switch (seleccion) {
                         case 1:
@@ -54,6 +56,15 @@ public class Consola {
                     break;
                 case 2:
                     System.out.println("Has elegido la Opción 2: Calcular datos buscados.");
+                    nombreArchivoRef = "referencias.txt";
+                    System.out.println("Indique el número de marcos de página");
+                    int marcospag = scanner.nextInt();
+                    String rutaref = System.getProperty("user.dir") + "/Salida/";
+                    nombreArchivoRef = "referencias.txt";
+                    simulador = new Simulador(marcospag, rutaref + nombreArchivoRef);
+                    simulador.ejecutarSimulacion();
+                    
+
                     break;
                 case 3:
                     System.out.println("Saliendo del programa...");
