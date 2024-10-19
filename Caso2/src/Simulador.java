@@ -116,10 +116,6 @@ public class Simulador{
         for (int i = 0; i < paginasCargadas.size(); i++) {
             referenciaBit[i] = false;
         }
-    }
-
-    public static void main(String[] args) {
-        Simulador simulador = new Simulador(3, "referencias.txt");
-        simulador.ejecutarSimulacion();
+    
     }
 }

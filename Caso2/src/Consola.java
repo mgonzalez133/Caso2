@@ -206,7 +206,7 @@ public class Consola {
             }
 
             System.out.println();
-        } while (opcion != 3);
+        } while (opcion != 5);
 
         scanner.close();
     }

@@ -1,1 +1,1 @@
-Este es un archivo de prueba que contiene exactamente cien caracteres. Aquí está el final.
+Este es un ejemplo de texto que contiene exactamente cien caracteres, incluyendo los espacios.
