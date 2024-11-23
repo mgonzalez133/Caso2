@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,26 +33,14 @@ public class Consola {
                 case 1:
                     System.out.println("Por favor, indique el tamaño de página:");
                     int tamanoPaginas = scanner.nextInt();
-                    System.out.println("Por favor, seleccione la imagen:");
-                    System.out.println("1. caso2-parrots_mod.bmp");
-                    System.out.println("2. caso2-parrots.bmp");
-                    int seleccion = scanner.nextInt();
-                    System.out.println(System.getProperty("user.dir") + "/Archivos/");
-                    String ruta = System.getProperty("user.dir") + "/Archivos/";
                     String nombreArchivo = "";
                     String nombreArchivoRef = "";
 
-                    switch (seleccion) {
-                        case 1:
-                            nombreArchivo = "caso2-parrots_mod.bmp";
-                            break;
-                        case 2:
-                            nombreArchivo = "caso2-parrots.bmp";
-                            break;
-                        default:
-                            System.out.println("Selección no válida. Debe elegir 1 o 2.");
-                            continue; 
-                    }
+                    Scanner scannerRuta = new Scanner(System.in);
+                    System.out.println("Por favor, ingresa la ruta del archivo que deseas cargar:");
+
+                    String ruta = scannerRuta.nextLine();
+                    
 
                     Imagen imagen = new Imagen(ruta + nombreArchivo);
                     referencias = new Referencias(imagen, tamanoPaginas);
@@ -71,10 +60,8 @@ public class Consola {
                     break;
 
                 case 3:
-                    System.out.println("Seleccione una de las siguientes imagenes:");
-                    System.out.println("1. caso2-parrots_mod.bmp");
-                    System.out.println("2. caso2-parrots.bmp");
-                    System.out.println("3. Otro");
+                    
+                    System.out.println("1. Imagen  a esconder");
 
                     int opcionImagenEsconder = scanner.nextInt();
                     scanner.nextLine(); 
@@ -85,12 +72,6 @@ public class Consola {
 
                     switch (opcionImagenEsconder) {
                         case 1:
-                            archivoImagenEsconder = "caso2-parrots_mod.bmp";
-                            break;
-                        case 2:
-                            archivoImagenEsconder = "caso2-parrots.bmp";
-                            break;
-                        case 3:
                             System.out.println(
                                     "Ingrese el nombre del archivo:");
                             archivoImagenEsconder = scanner.nextLine();
@@ -103,7 +84,6 @@ public class Consola {
                     imagen = new Imagen(rutaBaseImagenEsconder + archivoImagenEsconder);
 
                     System.out.println("Seleccione uno de los siguientes archivos de texto archivo de texto con el mensaje para esconder:");
-                    System.out.println("1. caso2-mensaje_dollshousep1.txt");
                     System.out.println("2. 100.txt");
                     System.out.println("3. 1000.txt");
                     System.out.println("4. 2000.txt");
@@ -117,9 +97,7 @@ public class Consola {
                     String archivoTextoEsconder = "";
 
                     switch (opcionTextoEsconder) {
-                        case 1:
-                            archivoTextoEsconder = "caso2-mensaje_dollshousep1.txt";
-                            break;
+                        
                         case 2:
                             archivoTextoEsconder = "100.txt";
                             break;
